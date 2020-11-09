@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<modification>
+    <name>Country Sort</name>
+    <version>1.0</version>
+	<code>Country_sort</code>
+    <author>D2boy</author>
+    <link>https://opencartforum.com/profile/21589-d2boy/</link>
+    <file path="catalog/model/localisation/country.php">
+	    <operation>
+            <search><![CDATA[
+            $query = $this->db->query("SELECT * FROM " . DB_PREFIX . "country WHERE status = '1' ORDER BY name ASC");
+            ]]></search>
+            <add position="replace"><![CDATA[
+            $query = $this->db->query("SELECT * FROM " . DB_PREFIX . "country WHERE status = '1' ORDER BY country_id!=74,name ASC");
+            ]]></add>
+        </operation>
+    </file> 
+    <file path="admin/model/localisation/country.php">
+        <operation>
+            <search><![CDATA[
+            $query = $this->db->query("SELECT * FROM " . DB_PREFIX . "country ORDER BY name ASC");
+            ]]></search>
+            <add position="replace"><![CDATA[
+            $query = $this->db->query("SELECT * FROM " . DB_PREFIX . "country ORDER BY country_id!=74,name ASC");
+            ]]></add>
+        </operation>
+    </file>  
+</modification>
