@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<modification>
+  <code>add-price-to-meta-description</code>
+  <name>Добавление цены в meta-description/title</name>
+  <version>1</version>
+  <author>d2boy</author>
+  <link>http://opencartforum.com</link>
+  <file path="catalog/controller/product/product.php">
+     <operation>
+      <search><![CDATA[$this->document->setDescription($product_info['meta_description']);]]></search>
+      <add position="replace"><![CDATA[// $this->document->setDescription($product_info['meta_description']);]]></add>
+    </operation>
+    <operation>
+      <search><![CDATA[$this->document->setTitle($product_info['meta_title']);]]></search>
+      <add position="replace"><![CDATA[// $this->document->setTitle($product_info['meta_title']);]]></add>
+     </operation>
+     <operation>
+      <search><![CDATA[$discounts = $this->model_catalog_product->getProductDiscounts($this->request->get['product_id']);]]></search>
+      <add position="before"><![CDATA[
+  			// start meta description replacement
+
+			if(strpos(($product_info['meta_description']), '{price}') !== false) {
+
+				if ($data['price']) { $meta_desc_price = $data['price']; } 	
+				if ($data['special']) { $meta_desc_price = $data['special']; } 				
+
+				$meta_desc_replace = str_replace('{price}',$meta_desc_price,$product_info['meta_description']);
+				
+				$this->document->setDescription($meta_desc_replace);
+					} else { 
+				$this->document->setDescription($product_info['meta_description']);
+					}						
+			
+			// start meta title replacement
+			
+			if(strpos(($product_info['meta_title']), '{price}') !== false) {
+
+				if ($data['price']) { $meta_title_price = $data['price'];} 	
+				if ($data['special']) { $meta_title_price = $data['special'];} 				
+
+				$meta_title_replace = str_replace('{price}',$meta_title_price,$product_info['meta_title']);
+				
+				$this->document->setTitle($meta_title_replace);
+					} else { 
+				$this->document->setTitle($product_info['meta_title']);
+					}						
+				
+			// end meta description replacement
+			
+      ]]></add>
+    </operation>
+  </file>
+</modification>
