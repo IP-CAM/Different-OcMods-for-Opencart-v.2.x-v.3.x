@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<modification>
+  <code>add-h1-title-category</code>
+  <name>Добавление заголовков H1 на страницу категории</name>
+  <version>1</version>
+  <author>d2boy</author>
+  <link>https://opencartforum.com/profile/21589-d2boy/</link>
+  <file path="admin/controller/catalog/category.php">
+     <operation>
+      <search><![CDATA[$data['entry_meta_title'] = $this->language->get('entry_meta_title');]]></search>
+      <add position="after"><![CDATA[$data['entry_meta_h1'] = $this->language->get('entry_meta_h1');]]></add>
+    </operation>
+  </file>
+  <file path="admin/language/russian/catalog/category.php">
+     <operation>
+      <search><![CDATA[$_['entry_meta_title'] 	     = 'Мета-тег Title';]]></search>
+      <add position="after"><![CDATA[$_['entry_meta_h1']          = 'HTML-тег H1';]]></add>
+    </operation>
+  </file>
+  <file path="admin/model/catalog/category.php">
+     <operation>
+      <search><![CDATA[$this->db->query("INSERT INTO " . DB_PREFIX . "category_description SET category_id = '" . (int)$category_id . "', language_id = '" . (int)$language_id . "', name = '" . $this->db->escape($value['name']) . "', description = '" . $this->db->escape($value['description']) . "', meta_title = '" . $this->db->escape($value['meta_title']) . "', meta_description = '" . $this->db->escape($value['meta_description']) . "', meta_keyword = '" . $this->db->escape($value['meta_keyword']) . "'");]]></search>
+      <add position="replace"><![CDATA[$this->db->query("INSERT INTO " . DB_PREFIX . "category_description SET category_id = '" . (int)$category_id . "', language_id = '" . (int)$language_id . "', name = '" . $this->db->escape($value['name']) . "', description = '" . $this->db->escape($value['description']) . "', meta_title = '" . $this->db->escape($value['meta_title']) . "', meta_h1 = '" . $this->db->escape($value['meta_h1']) . "', meta_description = '" . $this->db->escape($value['meta_description']) . "', meta_keyword = '" . $this->db->escape($value['meta_keyword']) . "'");]]></add>
+    </operation>
+     <operation>
+      <search><![CDATA['meta_title'       => $result['meta_title'],]]></search>
+      <add position="after"><![CDATA['meta_h1'          => $result['meta_h1'],]]></add>
+    </operation>
+  </file>
+  <file path="admin/view/template/catalog/category_form.tpl">
+     <operation>
+      <search index="0"><![CDATA[<div class="form-group">]]></search>
+      <add position="before"><![CDATA[
+                  <!-- h1 start -->
+                  <div class="form-group">
+                    <label class="col-sm-2 control-label" for="input-meta-h1<?php echo $language['language_id']; ?>"><?php echo $entry_meta_h1; ?></label>
+                    <div class="col-sm-10">
+                      <input type="text" name="category_description[<?php echo $language['language_id']; ?>][meta_h1]" value="<?php echo isset($category_description[$language['language_id']]) ? $category_description[$language['language_id']]['meta_h1'] : ''; ?>" placeholder="<?php echo $entry_meta_h1; ?>" id="input-meta-h1<?php echo $language['language_id']; ?>" class="form-control" />
+                    </div>
+                  </div>
+                  <!-- h1 end -->
+      ]]></add>
+    </operation>
+  </file>
+  <file path="catalog/controller/product/category.php">
+     <operation>
+      <search><![CDATA[$data['heading_title'] = $category_info['name'];]]></search>
+      <add position="replace"><![CDATA[
+            if ($category_info['meta_h1']) {
+				$data['heading_title'] = $category_info['meta_h1'];
+			} else {
+				$data['heading_title'] = $category_info['name'];
+			}
+      ]]></add>
+    </operation>
+  </file>
+</modification>
