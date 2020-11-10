@@ -1,0 +1,272 @@
+<?xml version="1.0" encoding="utf-8"?>
+<modification>
+    <name>Оптовая продажа</name>
+    <code>default</code>
+    <version>0.9.0</version>
+    <author>d2boy</author>
+    <link>http://forum.opencart.com</link>
+    <file path="catalog/controller/product/product.php">
+        <operation>
+            <search><![CDATA[$data['model'] = $product_info['model'];]]></search>
+            <add position="before"><![CDATA[$data['warehouse'] = $product_info['quantity'];]]></add>
+        </operation>
+    </file>
+        <file path="catalog/view/theme/*/template/product/product.tpl">
+        <operation>
+            <search><![CDATA[<?php if ($option['type'] == 'text') { ?>]]></search>
+            <add position="replace"><![CDATA[
+                 <?php if ($option['type'] == 'text' && $option['name'] == 'Коробка') { ?>
+                    <?php if ($option['value'] <= $warehouse ) { ?>
+                     <div class="form-group btn-group radio">
+                      <div class="btn-group radio" data-toggle="buttons">
+                        <label class="btn btn-default btn-sm"><?php echo $option['name']; ?>
+                            <input type="radio" id="radio-opt" name="option[<?php echo $option['product_option_id']; ?>]" value="<?php echo $option['value']; ?>" />
+                        </label>
+                        </div>
+                    </div>
+                    <script type="text/javascript"><!--
+                      $(document).ready(function() {
+                        $('#radio-opt').bind('change', function() {
+                            $('#input-quantity').before('<input type="text" value="" id="input-opt" class="form-control text-center" />'); 
+                            $('#input-quantity').addClass('hidden');
+                            // $('#input-wholesale').removeClass('hidden');
+                            $('#input-quantity').val(<?php echo $option['value']; ?>);
+                            $('#input-opt').val(1 + ' кор. ' + '(' + <?php echo $option['value']; ?> + ' шт.)');            
+                        });    
+                      });
+                    //--></script>
+                    <?php } else { ?>
+                    <span style="font-size: 0.9em">Этот товар можно заказать только поштучно</span>
+                    <?php } ?>
+                  <?php } ?>
+                  
+                  <?php if ($option['type'] == 'text'  && $option['name'] !== 'Коробка' ) { ?>
+			]]></add>
+        </operation>
+        <operation>
+            <search><![CDATA[<?php echo $footer; ?>]]></search>
+            <add position="before"><![CDATA[
+            <!-- Button +/- click -->
+            <script type="text/javascript"><!--
+                $(document).on('click', '.number-spinner button', function () {    
+                  var btn = $(this),
+                    oldValue = $('#input-quantity').val().trim()
+                    newVal = 1;
+                {
+                    if ( $('#radio-opt').prop('checked') ) {       
+                      var incVal = parseInt($("#radio-opt").val(), 10);          
+                    } else {
+                      var incVal = <?php echo $minimum ?>;
+                    }    
+            
+                  if (btn.attr('data-dir') == 'up')  {
+                    newVal = parseInt(oldValue) + incVal;
+                  } else {
+                    if (oldValue > incVal) {
+                      newVal = parseInt(oldValue) - incVal;
+                    } else {
+                      newVal = incVal;
+                    }
+                  }
+            
+                  $('#input-quantity').val(newVal);
+                  $('#input-opt').val(newVal/incVal + ' кор. ' + '(' + newVal + ' шт.)');      
+                }
+            
+                });
+            //--></script>
+			]]></add>
+        </operation>
+        <operation>
+            <search><![CDATA[<?php if ($option['type'] == 'text') { ?>]]></search>
+            <add position="replace"><![CDATA[
+            <?php if ($option['type'] == 'text' && $option['name'] != 'Коробка') { ?>
+                <div class="btn-group radio" data-toggle="buttons">
+                    <label class="btn btn-default btn-sm"><?php echo $option['name']; ?>
+                        <input type="radio" id="radio-opt" name="option[<?php echo $option['product_option_id']; ?>]" value="<?php echo $option['value']; ?>" />
+                    </label>
+                </div>
+            <script type="text/javascript"><!--
+              $(document).ready(function() {
+                $('#radio-opt').bind('change', function() {
+                    $('#input-quantity').before('<input type="text" value="" id="input-opt" class="form-control text-center" />'); 
+                    $('#input-quantity').addClass('hidden');
+                    // $('#input-wholesale').removeClass('hidden');
+                    $('#input-quantity').val(<?php echo $option['value']; ?>);
+                    $('#input-opt').val(1 + ' кор. ' + '(' + <?php echo $option['value']; ?> + ' шт.)');            
+                });    
+              });
+            //--></script>
+            <?php } ?>
+			]]></add>
+        </operation>
+        <operation>
+            <search><![CDATA[<?php if ($option['type'] == 'textarea') { ?>]]></search>
+            <add position="before"><![CDATA[
+                <?php } ?>
+			]]></add>
+        </operation>
+        <operation>
+            <search><![CDATA[<?php echo $footer; ?>]]></search>
+            <add position="before"><![CDATA[
+            <!-- Button +/- click -->
+            <script type="text/javascript"><!--
+                $(document).on('click', '.number-spinner button', function () {    
+                  var btn = $(this),
+                    oldValue = $('#input-quantity').val().trim()
+                    newVal = 1;
+                {
+                
+                    if ( $('#radio-opt').prop('checked') ) {
+                      <?php if ($options) { ?>
+                          <?php foreach ($options as $option) { ?>
+                          <?php if ($option['name'] == 'Коробка') { ?>
+                               var incVal =  <?php echo $option['value'] ?>;
+                            <?php } ?>
+                          <?php } ?>
+                      <?php } ?>
+                    } else {
+                      var incVal = <?php echo $minimum ?>;
+                    }    
+            
+                  if (btn.attr('data-dir') == 'up')  {
+                    newVal = parseInt(oldValue) + incVal;
+                  } else {
+                    if (oldValue > incVal) {
+                      newVal = parseInt(oldValue) - incVal;
+                    } else {
+                      newVal = incVal;
+                    }
+                  }
+            
+                  $('#input-quantity').val(newVal);
+                      <?php if ($options) { ?>
+                          <?php foreach ($options as $option) { ?>
+                              <?php if ($option['name'] == 'Коробка') { ?>
+                                  $('#input-opt').val(newVal/<?php echo $option['value']; ?> + ' кор. ' + '(' + newVal + ' шт.)');
+                              <?php } ?>
+                          <?php } ?>
+                      <?php } ?>
+                }
+                });
+            //--></script>
+			]]></add>
+        </operation>
+    </file>
+    <file path="catalog/view/theme/*/template/common/cart.tpl">
+        <operation>
+            <search><![CDATA[- <small><?php echo $option['name']; ?> <?php echo $option['value']; ?></small>]]></search>
+            <add position="replace"><![CDATA[
+                <?php if ($option['name'] == 'Коробка') { ?>
+                    <?php $n = ($product['quantity'] / $option['value']); ?>
+                    <?php $pl = $n%10==1&&$n%100!=11?'коробка':($n%10>=2&&$n%10<=4&&($n%100<10||$n%100>=20)?'коробки':'коробок'); ?>
+                    - <small><?php echo $option['name']; ?> (<?php echo $n . ' ' . $pl ?>)</small>
+                    <?php } else { ?>
+                    &nbsp;<small> - <?php echo $option['name']; ?>: <?php echo $option['value']; ?></small>
+                <?php } ?>
+			]]></add>
+        </operation>
+    </file>
+    <file path="catalog/view/theme/*/template/checkout/cart.tpl">
+        <operation>
+            <search><![CDATA[<small><?php echo $option['name']; ?>: <?php echo $option['value']; ?></small>]]></search>
+            <add position="replace"><![CDATA[
+                <?php if ($option['name'] == 'Коробка') { ?>
+                    <?php $n = ($product['quantity'] / $option['value']); ?>
+                    <?php $pl = $n%10==1&&$n%100!=11?'коробка':($n%10>=2&&$n%10<=4&&($n%100<10||$n%100>=20)?'коробки':'коробок'); ?>
+                    - <small><?php echo $option['name']; ?> (<?php echo $n . ' ' . $pl ?>)</small>
+                    <?php } else { ?>
+                    &nbsp;<small> - <?php echo $option['name']; ?>: <?php echo $option['value']; ?></small>
+                <?php } ?>
+			]]></add>
+        </operation>
+    </file>
+    <file path="catalog/view/theme/*/template/checkout/confirm.tpl">
+        <operation>
+            <search><![CDATA[&nbsp;<small> - <?php echo $option['name']; ?>: <?php echo $option['value']; ?></small>]]></search>
+            <add position="replace"><![CDATA[
+                <?php if ($option['name'] == 'Коробка') { ?>
+                    <?php $n = ($product['quantity'] / $option['value']); ?>
+                    <?php $pl = $n%10==1&&$n%100!=11?'коробка':($n%10>=2&&$n%10<=4&&($n%100<10||$n%100>=20)?'коробки':'коробок'); ?>
+                    - <small><?php echo $option['name']; ?> (<?php echo $n . ' ' . $pl ?>)</small>
+                    <?php } else { ?>
+                    &nbsp;<small> - <?php echo $option['name']; ?>: <?php echo $option['value']; ?></small>
+                <?php } ?>
+			]]></add>
+        </operation>
+    </file>
+        <file path="catalog/view/theme/*/template/checkout/buy.tpl">
+        <operation>
+            <search><![CDATA[<small><?php echo $option['name']; ?>: <?php echo $option['value']; ?></small>]]></search>
+            <add position="replace"><![CDATA[
+               <?php if ($option['name'] == 'Коробка') { ?>
+                    <?php $n = ($product['quantity'] / $option['value']); ?>
+                    <?php $pl = $n%10==1&&$n%100!=11?'коробка':($n%10>=2&&$n%10<=4&&($n%100<10||$n%100>=20)?'коробки':'коробок'); ?>
+                    - <small><?php echo $option['name']; ?> (<?php echo $n . ' ' . $pl ?>)</small>
+                    <?php } else { ?>
+                    &nbsp;<small> - <?php echo $option['name']; ?>: <?php echo $option['value']; ?></small>
+                <?php } ?>
+			]]></add>
+        </operation>
+    </file>
+    <file path="catalog/view/theme/*/template/account/order_info.tpl">
+        <operation>
+            <search><![CDATA[&nbsp;<small> - <?php echo $option['name']; ?>: <?php echo $option['value']; ?></small>]]></search>
+            <add position="replace"><![CDATA[
+               <?php if ($option['name'] == 'Коробка') { ?>
+                    <?php $n = ($product['quantity'] / $option['value']); ?>
+                    <?php $pl = $n%10==1&&$n%100!=11?'коробка':($n%10>=2&&$n%10<=4&&($n%100<10||$n%100>=20)?'коробки':'коробок'); ?>
+                    - <small><?php echo $option['name']; ?> (<?php echo $n . ' ' . $pl ?>)</small>
+                    <?php } else { ?>
+                    &nbsp;<small> - <?php echo $option['name']; ?>: <?php echo $option['value']; ?></small>
+                <?php } ?>
+			]]></add>
+        </operation>
+    </file>
+   <!--     <file path="catalog/view/theme/*/template/mail/order.tpl">-->
+   <!--     <operation>-->
+   <!--         <search><![CDATA[&nbsp;<small> - <?php echo $option['name']; ?>: <?php echo $option['value']; ?></small>]]></search>-->
+   <!--         <add position="replace"><![CDATA[-->
+   <!--             <?php if ($option['name'] == 'Коробка') { ?>-->
+   <!--                 <small style="color:red"><strong> - Тип: Коробка</strong></small>-->
+   <!--             <?php } else { ?>-->
+   <!--                 &nbsp;<small> - <?php echo $option['name']; ?>: <?php echo $option['value']; ?></small>-->
+   <!--             <?php } ?>-->
+			<!--]]></add>-->
+   <!--     </operation>-->
+   <!--     <operation>-->
+   <!--         <search><![CDATA[<?php echo $product['quantity']; ?>]]></search>-->
+   <!--         <add position="replace"><![CDATA[-->
+   <!--             <?php if ($product['option']) { ?>-->
+   <!--                 <?php foreach ($product['option'] as $option) { ?>-->
+   <!--                     <?php if ($option['name'] == 'Коробка') { ?>-->
+   <!--                         <?php $n = ($product['quantity'] / $option['value']); ?>-->
+   <!--                         <?php $pl = $n%10==1&&$n%100!=11?'коробка':($n%10>=2&&$n%10<=4&&($n%100<10||$n%100>=20)?'коробки':'коробок'); ?>-->
+   <!--                         <span><?php echo $n . ' ' . $pl ?></span>-->
+   <!--                     <?php } else { ?>-->
+   <!--                         <?php $n = ($product['quantity']); ?>-->
+   <!--                         <?php $pl = $n%10==1&&$n%100!=11?'штука':($n%10>=2&&$n%10<=4&&($n%100<10||$n%100>=20)?'штуки':'штук'); ?>-->
+   <!--                         <?php echo $n . ' ' . $pl; ?>-->
+   <!--                     <?php } ?>-->
+   <!--                 <?php } ?>-->
+   <!--             <?php } else { ?>-->
+   <!--                 <?php $n = ($product['quantity']); ?>-->
+   <!--                 <?php $pl = $n%10==1&&$n%100!=11?'штука':($n%10>=2&&$n%10<=4&&($n%100<10||$n%100>=20)?'штуки':'штук'); ?>-->
+   <!--                 <?php echo $n . ' ' . $pl; ?>-->
+   <!--             <?php } ?>-->
+   <!--     	]]></add>-->
+   <!-- </operation>-->
+   <!-- </file>-->
+    
+    <file path="admin/view/template/sale/order_info.tpl">
+        <operation>
+            <search><![CDATA[<?php if ($option['type'] != 'file') { ?>]]></search>
+            <add position="replace"><![CDATA[
+               <?php if ($option['name'] == 'Коробка') { ?>
+                 &nbsp;<small style="color:red"><strong><?php echo $option['name'] ?>: (<?php echo ($product['quantity'] / $option['value']) ?> кор.)</strong></small>
+                <?php } elseif ($option['type'] != 'file') { ?>
+    		]]></add>
+        </operation>
+    </file>
+    
+</modification>
